@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <title>Controle de Clientes</title>
+    </head>
+    <body>
+        <h1>Alterar Cliente</h1>
+        <br>
+        <a href="ClienteListar.php">Listar Clientes</a><br>
+        <br>
+        <form action="" method=GET id="cadastroCliente">
+            Id: <input readonly type=text name="id" id="id"> <br>
+            Nome: <input type=text name="nome" id="nome"> <br>
+            Endereço: <input type=text name="endereco" id="endereco"> <br>
+            Codigo Postal: <input type=text name="codigoPostal" id="codigoPostal"> <br>
+            Pais: <input type=text name="pais" id="pais"> <br>
+            CPF: <input type=text name="cpf" id="cpf"> <br>
+            Passaporte: <input type=text name="passaporte" id="passaporte"> <br>
+            E-mail: <input type=text name="email" id="email"> <br>
+            Data Nascimento: <input type=date name="dataNascimento" id="dataNascimento"> <br>
+            <br><br>
+            <input type="button" value="Alterar" onclick="ValidarForm()">
+        </form>
+        <br>
+        <p id="msg"></p>
+        <script>
+            function validateEmail(email)
+            {
+                var reg = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+                if (reg.test(email)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            function FormValido(nome, endereco, codigoPostal, pais, cpf, passaporte, email, dataNascimento) {
+                let msg = "";
+                if (nome == "") {
+                    msg = "Nome não pode ser vazio. <br>";
+                }
+                if (endereco == "") {
+                    msg += "Endereço não pode ser vazio. <br>";
+                }
+                var codigoPostalNumbers = codigoPostal.replace(/\D/g, "");
+                if (codigoPostalNumbers.length != 8) {
+                    msg += "Codigo postal deve conter 8 numeros. <br>";
+                }
+                if (pais == "") {
+                    msg += "Pais não pode ser vazio. <br>";
+                }
+                var cpfNumbers = cpf.replace(/\D/g, "");
+                if (cpfNumbers.length != 11) {
+                    msg += "CPF deve conter 11 numeros. <br>";
+                }
+                if (passaporte == "") {
+                    msg += "Passaporte não pode ser vazio. <br>";
+                }
+                if (!validateEmail(email)) {
+                    msg += "Email não pode ser vazio. <br>";
+                }
+                if (dataNascimento == "") {
+                    msg += "Data Nascimento não pode ser vazio. <br>";
+                }
+
+                return msg;
+            }
+            function ValidarForm() {
+                let objForm = document.getElementById("cadastroCliente");
+
+                let nome = document.getElementById("nome").value;
+                let endereco = document.getElementById("endereco").value;
+                let codigoPostal = document.getElementById("codigoPostal").value;
+                let pais = document.getElementById("pais").value;
+                let cpf = document.getElementById("cpf").value;
+                let passaporte = document.getElementById("passaporte").value;
+                let email = document.getElementById("email").value;
+                let dataNascimento = document.getElementById("dataNascimento").value;
+
+                let mensagem = FormValido(nome, endereco, codigoPostal, pais, cpf, passaporte, email, dataNascimento);
+
+                if (mensagem == "") {
+                    EnviarForm(nome, endereco, codigoPostal, pais, cpf, passaporte, email, dataNascimento);
+                } else {
+                    document.getElementById("msg").innerHTML = mensagem;
+                }
+            }
+
+            function EnviarForm(nome, endereco, codigoPostal, pais, cpf, passaporte, email, dataNascimento) {
+                let xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log("Chegou resposta: " + this.responseText);
+
+                        let objReturnJSON = JSON.parse(this.responseText);
+                        alert(objReturnJSON.status);
+                        window.location.href = "ClienteListar.php";
+
+                    }
+                };
+                xmlHttp.open("GET", "ClienteAcoes.php?acao=atualizar"
+                        + "&id=" + document.getElementById("id").value
+                        + "&nome=" + nome
+                        + "&endereco=" + endereco
+                        + "&codigoPostal=" + codigoPostal
+                        + "&pais=" + pais
+                        + "&cpf=" + cpf
+                        + "&passaporte=" + passaporte
+                        + "&email=" + email
+                        + "&dataNascimento=" + dataNascimento);
+                xmlHttp.send();
+                console.log("Enviei requisição");
+            }
+
+
+            function BuscaDetalhes() {
+                var parametros = window.location.search.substring(1);
+                if (parametros == "") {
+                    alert("Por favor informar o id da pergunta na URL");
+                    return;
+                }
+                var myId = location.search.split('id=')[1] ? location.search.split('id=')[1] : '0';
+                if (myId == '0') {
+                    alert("Por favor informar o id correto da pergunta na URL");
+                    return;
+                }
+
+                let xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+
+                        let objReturnJSON = JSON.parse(this.responseText);
+                        console.log(objReturnJSON.status);
+
+                        document.getElementById("id").value = objReturnJSON.status.id;
+                        document.getElementById("nome").value = objReturnJSON.status.nome;
+                        document.getElementById("endereco").value = objReturnJSON.status.endereco;
+                        document.getElementById("codigoPostal").value = objReturnJSON.status.codigoPostal;
+                        document.getElementById("pais").value = objReturnJSON.status.pais;
+                        document.getElementById("cpf").value = objReturnJSON.status.cpf;
+                        document.getElementById("passaporte").value = objReturnJSON.status.passaporte;
+                        document.getElementById("email").value = objReturnJSON.status.email;
+                        document.getElementById("dataNascimento").value = objReturnJSON.status.dataNascimento;
+
+                    }
+                };
+                xmlHttp.open("GET", "ClienteAcoes.php?acao=buscar&id=" + myId);
+                xmlHttp.send();
+            }
+
+            BuscaDetalhes();
+        </script>
+    </body>
+</html>

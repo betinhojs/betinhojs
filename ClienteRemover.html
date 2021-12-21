@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <title>Controle de Clientes</title>
+    </head>
+    <body>
+        <h1>Remover o Cliente</h1>
+        <br>
+         <a href="ClienteListar.php">Listar Clientes</a><br>
+        <br>
+        <form action="" method=GET id="cadastroCliente">
+            Id: <input readonly type=text name="id" id="id"> <br>
+            Nome: <input readonly type=text name="nome" id="nome"> <br>
+            CPF: <input readonly type=text name="cpf" id="cpf"> <br>
+            <br><br>
+            <input type="button" value="REMOVER" onclick="EnviarForm()">
+        </form>
+        <br>
+        <p id="msg"></p>
+        <script>
+            function EnviarForm() {
+                let xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        console.log("Chegou resposta: " + this.responseText);
+
+                        let objReturnJSON = JSON.parse(this.responseText);
+                        alert(objReturnJSON.status);
+                        window.location.href = "ClienteListar.php";
+
+                    }
+                };
+                xmlHttp.open("GET", "ClienteAcoes.php?acao=remover"
+                        + "&id=" + document.getElementById("id").value);
+                xmlHttp.send();
+                console.log("Enviei requisição");
+            }
+
+
+            function BuscaDetalhes() {
+                var parametros = window.location.search.substring(1);
+                if (parametros == "") {
+                    alert("Por favor informar o id da pergunta na URL");
+                    return;
+                }
+                var myId = location.search.split('id=')[1] ? location.search.split('id=')[1] : '0';
+                if (myId == '0') {
+                    alert("Por favor informar o id correto da pergunta na URL");
+                    return;
+                }
+
+                let xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+
+                        let objReturnJSON = JSON.parse(this.responseText);
+                        console.log(objReturnJSON.status);
+                        
+                        document.getElementById("id").value = objReturnJSON.status.id;
+                        document.getElementById("nome").value = objReturnJSON.status.nome;
+                        document.getElementById("cpf").value = objReturnJSON.status.cpf;
+                    }
+                };
+                xmlHttp.open("GET", "ClienteAcoes.php?acao=buscar&id=" + myId);
+                xmlHttp.send();
+            }
+
+            BuscaDetalhes();
+        </script>
+    </body>
+</html>

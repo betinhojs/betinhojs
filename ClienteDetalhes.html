@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+         <title>Controle de Clientes</title>
+    </head>
+    <body>
+        <h1>Detalhes do Cliente</h1>
+        <br>
+        <a href="ClienteListar.php">Listar Clientes</a><br>
+        <br>
+        <form action="" method=GET id="cadastroCliente">
+            Id: <input readonly type=text name="id" id="id"> <br>
+            Nome: <input readonly type=text name="nome" id="nome"> <br>
+            Endereço: <input readonly type=text name="endereco" id="endereco"> <br>
+            Codigo Postal: <input readonly type=text name="codigoPostal" id="codigoPostal"> <br>
+            Pais: <input readonly type=text name="pais" id="pais"> <br>
+            CPF: <input readonly type=text name="cpf" id="cpf"> <br>
+            Passaporte: <input readonly type=text name="passaporte" id="passaporte"> <br>
+            E-mail: <input readonly type=text name="email" id="email"> <br>
+            Data Nascimento: <input readonly type=date name="dataNascimento" id="dataNascimento"> <br>
+            <br><br>
+
+        </form>
+        <br>
+        <p id="msg"></p>
+        <script>
+            function BuscaDetalhes() {
+                var parametros = window.location.search.substring(1);
+                if (parametros == "") {
+                    alert("Por favor informar o id da pergunta na URL");
+                    return;
+                }
+                var myId = location.search.split('id=')[1] ? location.search.split('id=')[1] : '0';
+                if (myId == '0') {
+                    alert("Por favor informar o id correto da pergunta na URL");
+                    return;
+                }
+
+                let xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+
+                        let objReturnJSON = JSON.parse(this.responseText);
+                        console.log(objReturnJSON.status);
+
+                        document.getElementById("id").value = objReturnJSON.status.id;
+                        document.getElementById("nome").value = objReturnJSON.status.nome;
+                        document.getElementById("endereco").value = objReturnJSON.status.endereco;
+                        document.getElementById("codigoPostal").value = objReturnJSON.status.codigoPostal;
+                        document.getElementById("pais").value = objReturnJSON.status.pais;
+                        document.getElementById("cpf").value = objReturnJSON.status.cpf;
+                        document.getElementById("passaporte").value = objReturnJSON.status.passaporte;
+                        document.getElementById("email").value = objReturnJSON.status.email;
+                        document.getElementById("dataNascimento").value = objReturnJSON.status.dataNascimento;
+
+                    }
+                };
+                xmlHttp.open("GET", "ClienteAcoes.php?acao=buscar&id=" + myId);
+                xmlHttp.send();
+            }
+
+            BuscaDetalhes();
+        </script>
+    </body>
+</html>
